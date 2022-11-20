@@ -22,6 +22,7 @@ class Receiver(object):
         # receive file
         message, sender_address = self.so.recvfrom(1027)
         while message:
+            #print('received seqno', int.from_bytes(message[0:2], 'big'))
             # check message seq_no
             if int.from_bytes(message[0:2], 'big') == self.sequence_no:
                 # write data
@@ -31,9 +32,6 @@ class Receiver(object):
                 ack = self.sequence_no.to_bytes(2, 'big')
                 self.so.sendto(ack, sender_address)
 
-                # update sequence_no
-                self.sequence_no += 1
-
                 # check if end of file
                 if message[2] == 1:
                     # send more acks as per instructions in question @152 of comn piazza 
@@ -41,6 +39,9 @@ class Receiver(object):
                         ack = self.sequence_no.to_bytes(2, 'big')
                         self.so.sendto(ack, sender_address)
                     break
+
+                # update sequence_no
+                self.sequence_no += 1
             
             # handle duplicate packets
             elif int.from_bytes(message[0:2], 'big') == self.sequence_no - 1:

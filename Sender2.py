@@ -47,15 +47,15 @@ class Sender(object):
             response = self.send_and_wait(message)
             while int.from_bytes(response, 'big') != self.sequence_no:
                 response = self.send_and_wait(message)
-            if end_of_file == 1:
-                end = timer() # stop timer after ack receipt for last message
             self.sequence_no += 1
-        
+
         # shut down
         #print("Transfer finished")
-        self.transfer_time = end - start
+        self.transfer_time = timer() - start
         self.so.close()
         myfile.close()
+
+        return self.rentransmissions, self.file_size / (1000 * self.transfer_time)
     
     def send_and_wait(self, message):
         #print('sending: ',self.sequence_no)
@@ -75,4 +75,5 @@ class Sender(object):
 if __name__ == '__main__':
     sender = Sender(sys.argv[1], int(sys.argv[2]), sys.argv[3], int(sys.argv[4]))
     sender.send_file()
-    print("{0} {1}".format(sender.rentransmissions, sender.file_size / (sender.transfer_time * 125)))
+    print("{0} {1}".format(sender.rentransmissions, sender.file_size / (1000 * sender.transfer_time)))
+    #print("{0} {1}".format(sender.rentransmissions, sender.file_size / (sender.transfer_time * 125)))
