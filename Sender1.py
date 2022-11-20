@@ -46,4 +46,3 @@ if __name__ == '__main__':
     # close sender
     so.close()
     myfile.close()
-    print('finished transferring')
